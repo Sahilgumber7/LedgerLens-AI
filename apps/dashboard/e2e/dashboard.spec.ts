@@ -73,9 +73,10 @@ test("landing page explains and checks the demo keyword", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/");
   await expect(page.getByRole("img", { name: "LedgerLens mark" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "When payment records do not match." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Payment records do not match." })).toBeVisible();
   await expect(page.getByLabel("Incident review process: read events, compare the ledger, verify a recovery")).toBeVisible();
   await expect(page.locator(".process-step")).toHaveCount(3);
+  await expect(page.locator(".brand-lockup small")).toHaveCount(0);
   const ledeSize = await page.locator(".landing-lede").evaluate(element => Number.parseFloat(getComputedStyle(element).fontSize));
   expect(ledeSize).toBeGreaterThanOrEqual(16);
   const themeButton = page.getByRole("button", { name: "Switch to light theme" });

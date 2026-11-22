@@ -60,3 +60,9 @@ No SQLAlchemy persistence/Alembic migrations or cross-process concurrency; no ac
 - Reworked the feature row into a three-stage diagram: read events, compare ledger, verify recovery. Raised landing headings, body text, form labels, and step labels; stacked the process for mobile.
 - Browser tests assert the process diagram and minimum body text size as well as landing/dashboard overflow at 320/375/768/1280px.
 - Verification: 8 Python tests, Ruff, dashboard lint/typecheck, and 4 Playwright tests passed. Inspected a local Edge screenshot at 1440x980.
+
+### Follow-up: landing page research and visual revision (2026-11-22)
+
+- Reviewed Nielsen Norman Group visual hierarchy guidance, Figma landing-page examples, and Stripe's numbered payment-flow explainer. Recorded the references and design decisions in `docs/LANDING_DESIGN.md`.
+- Removed the secondary descriptor beneath the logo. Simplified the heading to "Payment records do not match," removed generic copy, and kept one visual three-step process beside the workspace keyword form.
+- Enlarged process labels and simplified the steps to review events, compare the ledger, and test recovery. Browser coverage checks the visual, readable body text, and responsive widths.

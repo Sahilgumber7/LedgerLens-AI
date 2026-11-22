@@ -303,7 +303,7 @@ function Logo({ className = "" }: { className?: string }) {
       <path d="m35.5 28.5 5 5" stroke="#193d2d" strokeWidth="3" strokeLinecap="round" />
       <circle cx="29" cy="22" r="4" fill="#83c5a1" />
     </svg>
-    <span><b>LEDGERLENS</b><small>FINANCIAL OPERATIONS</small></span>
+    <span><b>LEDGERLENS</b></span>
   </div>;
 }
 
@@ -322,21 +322,21 @@ function LandingPage({ keyword, setKeyword, onSubmit, error, loading, theme, tog
     <section className="landing-layout">
       <div className="landing-copy">
         <span className="eyebrow">PAYMENT OPERATIONS DEMO</span>
-        <h1>When payment records<br /><em>do not match.</em></h1>
-        <p className="landing-lede">Review payment events, compare them with ledger postings, then test a correction in a sandbox.</p>
+        <h1>Payment records<br /><em>do not match.</em></h1>
+        <p className="landing-lede">Review payment events against ledger entries. Test a correction in the sandbox.</p>
         <div className="process-diagram" aria-label="Incident review process: read events, compare the ledger, verify a recovery">
-          <div className="process-step"><span className="process-index">01</span><span className="process-icon"><Icon name="alert" size={22} /></span><b>Read events</b><p>Order, gateway, webhook</p></div>
+          <div className="process-step"><span className="process-index">01</span><span className="process-icon"><Icon name="alert" size={22} /></span><b>Review events</b><p>Order, capture, webhook</p></div>
           <span className="process-link" aria-hidden="true"><i /></span>
           <div className="process-step"><span className="process-index">02</span><span className="process-icon"><Icon name="card" size={22} /></span><b>Compare ledger</b><p>Captures and journal entries</p></div>
           <span className="process-link" aria-hidden="true"><i /></span>
-          <div className="process-step"><span className="process-index">03</span><span className="process-icon"><Icon name="recovery" size={22} /></span><b>Verify recovery</b><p>Simulate, check, approve</p></div>
+          <div className="process-step"><span className="process-index">03</span><span className="process-icon"><Icon name="recovery" size={22} /></span><b>Test recovery</b><p>Simulate, check balances</p></div>
         </div>
       </div>
       <aside className="access-card" aria-labelledby="access-title">
         <div className="access-icon"><Icon name="key" size={20} /></div>
         <span className="eyebrow">DEMO WORKSPACE</span>
         <h2 id="access-title">Enter with a keyword</h2>
-        <p className="access-intro">Enter the keyword to open the sample incident workspace.</p>
+        <p className="access-intro">Enter the demo keyword to view the incident workspace.</p>
         <form onSubmit={onSubmit}>
           <label htmlFor="workspace-keyword">Workspace keyword</label>
           <div className="landing-key-input"><input id="workspace-keyword" value={keyword} onChange={event => setKeyword(event.target.value)} type={visible ? "text" : "password"} autoComplete="off" autoCapitalize="none" spellCheck={false} aria-describedby="access-key-help" required /><button type="button" onClick={() => setVisible(value => !value)} aria-label={visible ? "Hide keyword" : "Show keyword"}>{visible ? "Hide" : "Show"}</button></div>

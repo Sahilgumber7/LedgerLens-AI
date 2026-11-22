@@ -41,7 +41,6 @@ main { min-height: 100vh; display: grid; grid-template-columns: 232px minmax(0, 
 .brand-symbol { width: 40px; height: 40px; flex: 0 0 auto; }
 .brand-lockup > span { display: grid; gap: 2px; }
 .brand-lockup b { font-size: 11px; letter-spacing: 1.5px; }
-.brand-lockup small { color: var(--muted); font: 8px "Consolas", monospace; letter-spacing: 1px; }
 .navlabel, .eyebrow, .crumb { color: var(--muted); font: 10px/1.4 "Consolas", "Courier New", monospace; letter-spacing: 1.1px; }
 .navlabel { padding: 0 10px 10px; }
 .sidebar nav { display: grid; gap: 3px; }
@@ -269,7 +268,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; margin-top: 2
   .landing-nav { min-height: 72px; }
   .landing-nav .brand-symbol { width: 36px; height: 36px; }
   .landing-nav .brand-lockup b { font-size: 10px; }
-  .landing-nav .brand-lockup small { font-size: 7px; }
   .landing-copy h1 { font-size: clamp(42px, 10vw, 56px); letter-spacing: -1.9px; }
   .landing-actions { gap: 7px; }
   .landing-mode { font-size: 7px; letter-spacing: .35px; }

@@ -32,3 +32,5 @@ All displayed amounts are generated USD simulation data. The landing page accept
 See [architecture](docs/ARCHITECTURE.md), [financial model](docs/FINANCIAL_MODEL.md), [research](docs/RESEARCH.md), [threat model](docs/THREAT_MODEL.md), and [decisions](docs/DECISIONS.md). The visual and engineering bar takes inspiration from the user's `support-llm-3b` project: explicit proposer/authority boundaries, candid measurement, evidence-first product narrative, and a concise runnable demo path.
 
 See [dataset and related-project review](docs/DATASETS_AND_RELATED_WORK.md) for sourced benchmark candidates, license cautions, and a recommendation for FinOpsBench. The dashboard's overview charts query the running API; its keyword field is a local sandbox demo gate, not account authentication.
+
+The landing page's visual hierarchy and workflow diagram are documented in [landing design notes](docs/LANDING_DESIGN.md).
