@@ -72,7 +72,7 @@ TRANSITIONS = {
 class Account:
     id: str
     kind: AccountType
-    currency: str = "INR"
+    currency: str = "USD"
 
 
 @dataclass(frozen=True)
@@ -80,7 +80,7 @@ class Line:
     account_id: str
     side: Side
     amount_minor: int
-    currency: str = "INR"
+    currency: str = "USD"
 
 
 @dataclass(frozen=True)
@@ -129,8 +129,8 @@ class Ledger:
         self.keys: dict[str, str] = {}
 
     def add_account(self, a: Account):
-        if a.currency != "INR":
-            raise DomainError("only INR is enabled")
+        if a.currency != "USD":
+            raise DomainError("only USD is enabled")
         if a.id in self.accounts:
             raise DomainError("account already exists")
         self.accounts[a.id] = a
@@ -152,7 +152,7 @@ class Ledger:
             if x.amount_minor <= 0 or not isinstance(x.amount_minor, int):
                 raise DomainError("amount must be a positive integer minor-unit value")
             if (
-                x.currency != "INR"
+                x.currency != "USD"
                 or x.account_id not in self.accounts
                 or self.accounts[x.account_id].currency != x.currency
             ):

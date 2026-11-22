@@ -7,7 +7,7 @@
 Financial incident review requires reproducible past state and a trail of corrections.
 
 ## Decision
-Represent posted journals as immutable records in integer INR paise. Require debit/credit equality and idempotency keys. Correct posted records through compensating entries rather than edit/delete.
+Represent posted journals as immutable records in integer USD cents. Require debit/credit equality and idempotency keys. Correct posted records through compensating entries rather than edit/delete.
 
 ## Consequences
 Audit history remains explainable, while posting idempotency and atomic storage still need durable database constraints in the next phase.

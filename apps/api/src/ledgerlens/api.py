@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 import os
+import secrets
 import threading
 from uuid import uuid4
 from fastapi import FastAPI, HTTPException, Header
@@ -61,6 +62,10 @@ class RecoveryRequest(BaseModel):
     journal_id: str
 
 
+class KeywordAccessRequest(BaseModel):
+    keyword: str
+
+
 @app.get("/api/v1/health")
 def health():
     return {
@@ -69,6 +74,19 @@ def health():
         "llm": "not_configured",
         "persistence": "process-local",
     }
+
+
+@app.post("/api/v1/auth/keyword")
+def keyword_access(request: KeywordAccessRequest):
+    """Demo workspace gate; it is not identity authentication or an API security boundary."""
+    expected = os.getenv("LEDGERLENS_ACCESS_KEYWORD") or os.getenv("LEDGERLENS_APPROVAL_TOKEN")
+    if not expected and os.getenv("LEDGERLENS_MODE", "simulation") == "simulation":
+        expected = "local-demo-approval"
+    if not expected:
+        raise HTTPException(503, "keyword access is not configured")
+    if not secrets.compare_digest(request.keyword, expected):
+        raise HTTPException(403, "keyword not accepted")
+    return {"status": "accepted", "mode": "simulation", "scope": "demo_workspace"}
 
 
 @app.get("/api/v1/incidents")

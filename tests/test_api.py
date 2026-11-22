@@ -6,6 +6,8 @@ from ledgerlens.core import Line, Side
 def test_health_and_incident_evidence_api():
     c = TestClient(app)
     assert c.get("/api/v1/health").json()["mode"] == "simulation"
+    assert c.post("/api/v1/auth/keyword", json={"keyword": "wrong"}).status_code == 403
+    assert c.post("/api/v1/auth/keyword", json={"keyword": "local-demo-approval"}).json()["status"] == "accepted"
     overview = c.get("/api/v1/overview").json()
     assert overview["data_origin"] == "generated simulation"
     assert overview["open_incidents"] == 1
@@ -22,6 +24,13 @@ def test_health_and_incident_evidence_api():
         and diagnosis.json()["observed_facts"]
     )
     assert c.get("/api/v1/incidents/unknown/evidence").status_code == 404
+
+
+def test_workspace_keyword_can_be_configured(monkeypatch):
+    c = TestClient(app)
+    monkeypatch.setenv("LEDGERLENS_ACCESS_KEYWORD", "test-workspace-key")
+    assert c.post("/api/v1/auth/keyword", json={"keyword": "test-workspace-key"}).status_code == 200
+    assert c.post("/api/v1/auth/keyword", json={"keyword": "local-demo-approval"}).status_code == 403
 
 
 def test_approval_gated_sandbox_recovery(monkeypatch):

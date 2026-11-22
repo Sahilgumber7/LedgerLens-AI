@@ -1,7 +1,7 @@
 # Architecture decisions
 
 1. **Deterministic core before LLM.** Money and authorization cannot be delegated to a model. Tool caller is planned; current investigator is deterministic and clearly labeled.
-2. **Integer paise, INR v1.** Avoid floating point; currencies are explicit even though only INR is enabled.
+2. **Integer cents, USD v1.** Avoid floating point; currencies are explicit even though only USD is enabled.
 3. **Immutable postings and compensation.** A correction adds a reversal/compensating transaction, never edits history.
 4. **Independent payment and settlement state.** A payment capture observation does not assert settlement.
 5. **Evidence distinguishes observed and inferred.** Correlation is not causal proof; graph edges carry provenance.

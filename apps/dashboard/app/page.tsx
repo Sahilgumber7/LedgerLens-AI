@@ -27,7 +27,7 @@ type IconName = "alert" | "card" | "recovery" | "bench" | "sun" | "moon" | "chec
 
 const api = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 const demoKeyword = "local-demo-approval";
-const inr = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" });
+const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 
 function Icon({ name, size = 16 }: { name: IconName; size?: number }) {
   const paths: Record<IconName, React.ReactNode> = {
@@ -44,6 +44,10 @@ function Icon({ name, size = 16 }: { name: IconName; size?: number }) {
 }
 
 export default function Home() {
+  const [workspaceAccess, setWorkspaceAccess] = useState(false);
+  const [accessKeyword, setAccessKeyword] = useState(demoKeyword);
+  const [accessError, setAccessError] = useState("");
+  const [accessLoading, setAccessLoading] = useState(false);
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [graph, setGraph] = useState<Graph | null>(null);
   const [overview, setOverview] = useState<Overview | null>(null);
@@ -65,6 +69,7 @@ export default function Home() {
       setTheme(saved);
       document.documentElement.dataset.theme = saved;
     }
+    if (!workspaceAccess) return;
     async function load() {
       try {
         const [response, overviewResponse, auditResponse] = await Promise.all([fetch(`${api}/api/v1/incidents`), fetch(`${api}/api/v1/overview`), fetch(`${api}/api/v1/audit`)]);
@@ -90,7 +95,29 @@ export default function Home() {
       }
     }
     void load();
-  }, []);
+  }, [workspaceAccess]);
+
+  async function enterWorkspace(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setAccessError("");
+    setAccessLoading(true);
+    try {
+      const response = await fetch(`${api}/api/v1/auth/keyword`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ keyword: accessKeyword.trim() }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.detail ?? "Keyword was not accepted.");
+      setWorkspaceAccess(true);
+    } catch (cause) {
+      setAccessError(cause instanceof Error ? cause.message : "Workspace access failed.");
+    } finally {
+      setAccessLoading(false);
+    }
+  }
+
+  if (!workspaceAccess) return <LandingPage keyword={accessKeyword} setKeyword={setAccessKeyword} onSubmit={enterWorkspace} error={accessError} loading={accessLoading} theme={theme} toggleTheme={toggleTheme} />;
 
   function toggleTheme() {
     const next = theme === "dark" ? "light" : "dark";
@@ -149,7 +176,7 @@ export default function Home() {
   return (
     <main>
       <aside className="sidebar">
-        <div className="brand"><span className="mark">L</span><span>LEDGERLENS</span></div>
+        <Logo className="brand" />
         <div className="navlabel">WORKSPACE</div>
         <nav aria-label="Workspace">
           <a className="active" href="#incidents"><Icon name="alert"/> <span>Incidents</span><b>{loading ? "..." : incidents.length}</b></a>
@@ -169,13 +196,14 @@ export default function Home() {
               <Icon name={theme === "dark" ? "sun" : "moon"}/><span>{theme === "dark" ? "Light" : "Dark"}</span>
             </button>
             <div className="status"><span className="live-dot"/> Simulation data</div>
+            <button className="theme logout" type="button" onClick={() => { setWorkspaceAccess(false); setRecoveryId(""); setRecoveryStatus(""); }}>Exit demo</button>
           </div>
         </header>
 
         <section className="intro" aria-label="Operational overview">
           <div className="intro-copy"><span className="eyebrow">FINANCIAL CONTROL PLANE</span><h2>Trace the discrepancy.<br/>Verify the next action.</h2><p>Evidence-backed incident review across payment and ledger systems.</p></div>
           <div className="overview"><span>OPEN INCIDENTS</span><strong>{overview?.open_incidents ?? "..."}</strong><small>Live API query</small></div>
-          <div className="overview"><span>SUSPECTED EXPOSURE</span><strong>{overview ? inr.format(overview.suspected_exposure_minor / 100) : "..."}</strong><small>Integer minor units | generated data</small></div>
+          <div className="overview"><span>SUSPECTED EXPOSURE</span><strong>{overview ? usd.format(overview.suspected_exposure_minor / 100) : "..."}</strong><small>Integer cents | generated data</small></div>
         </section>
 
         {error && <div className="error" role="alert">{error}</div>}
@@ -187,7 +215,7 @@ export default function Home() {
           </article>
           <article className="viz-card"><div className="sectionhead"><div><span className="eyebrow">CURRENT STATE</span><h2>Incident severity</h2></div><span className="tag">live</span></div>
             {overview && <div className="severity-visual"><div className="donut" style={{ "--severity-share": `${overview.open_incidents ? ((overview.severity_counts.high ?? 0) / overview.open_incidents) * 100 : 0}%` } as React.CSSProperties} role="img" aria-label={`${overview.open_incidents} open incidents`}><span><b>{overview.open_incidents}</b><small>open</small></span></div><div className="legend">{Object.entries(overview.severity_counts).map(([name, count]) => <div key={name}><i className={`legend-dot ${name}`} /><span>{name}</span><b>{count}</b></div>)}{overview.open_incidents === 0 && <p className="caption">No active incidents.</p>}</div></div>}
-            <div className="metric-strip"><span>Affected payments <b>{overview?.affected_payments ?? "..."}</b></span><span>Journals <b>{overview?.journal_count ?? "..."}</b></span><span>Verified loss <b>{overview?.verified_loss_minor === null ? "Not established" : overview ? inr.format(overview.verified_loss_minor / 100) : "..."}</b></span></div>
+            <div className="metric-strip"><span>Affected payments <b>{overview?.affected_payments ?? "..."}</b></span><span>Journals <b>{overview?.journal_count ?? "..."}</b></span><span>Verified loss <b>{overview?.verified_loss_minor === null ? "Not established" : overview ? usd.format(overview.verified_loss_minor / 100) : "..."}</b></span></div>
           </article>
         </section>
 
@@ -197,7 +225,7 @@ export default function Home() {
             <table><caption className="sr-only">Detected financial incidents and suspected exposure</caption><thead><tr><th scope="col">INCIDENT</th><th scope="col">PAYMENT</th><th scope="col">SEVERITY</th><th scope="col">SUSPECTED EXPOSURE</th><th scope="col">STATUS</th></tr></thead>
               <tbody>
                 {!loading && incidents.length === 0 && <tr><td colSpan={5} className="empty">No incidents detected in this simulation.</td></tr>}
-                {incidents.map(item => <tr key={item.id}><td className="mono link">{item.id}</td><td className="mono">{item.payment_id}</td><td><span className="severity">{item.severity}</span></td><td className="mono">{inr.format(item.exposure_minor / 100)}</td><td><span className="open"><span className="status-dot"/> {item.status}</span></td></tr>)}
+                {incidents.map(item => <tr key={item.id}><td className="mono link">{item.id}</td><td className="mono">{item.payment_id}</td><td><span className="severity">{item.severity}</span></td><td className="mono">{usd.format(item.exposure_minor / 100)}</td><td><span className="open"><span className="status-dot"/> {item.status}</span></td></tr>)}
               </tbody>
             </table>
           </div>
@@ -264,4 +292,64 @@ function EvidenceGraph({ graph }: { graph: Graph }) {
     {graph.edges.map((edge, index) => { const from = pointById.get(edge.source); const to = pointById.get(edge.target); return from && to ? <line key={`${edge.source}-${edge.target}-${index}`} x1={from.x} y1={from.y} x2={to.x} y2={to.y} className={edge.inferred ? "graph-edge inferred" : "graph-edge"} /> : null; })}
     {points.map(({ node, x, y }) => <g key={node.id}><circle cx={x} cy={y} r="7" className={`graph-point ${node.type}`} /><text x={x} y={y + 19} textAnchor="middle">{(node.event_type ?? node.type).replaceAll("_", " ").slice(0, 15)}</text></g>)}
   </svg><div className="graph-note"><span><i className="graph-dot" /> Observed record</span><span>Solid line: detector reference</span><span>Edges do not establish causality</span></div></div>;
+}
+
+function Logo({ className = "" }: { className?: string }) {
+  return <div className={`brand-lockup ${className}`} aria-label="LedgerLens AI">
+    <svg className="brand-symbol" viewBox="0 0 48 48" role="img" aria-label="LedgerLens mark">
+      <rect x="1" y="1" width="46" height="46" rx="12" fill="#ccebdc" />
+      <path d="M12 14h11M12 19h8M12 24h7M12 29h8M12 34h10" stroke="#193d2d" strokeWidth="2.2" strokeLinecap="round" />
+      <circle cx="29" cy="22" r="9" fill="#f5fbf7" stroke="#193d2d" strokeWidth="2.4" />
+      <path d="m35.5 28.5 5 5" stroke="#193d2d" strokeWidth="3" strokeLinecap="round" />
+      <circle cx="29" cy="22" r="4" fill="#83c5a1" />
+    </svg>
+    <span><b>LEDGERLENS</b><small>FINANCIAL OPERATIONS</small></span>
+  </div>;
+}
+
+function LandingPage({ keyword, setKeyword, onSubmit, error, loading, theme, toggleTheme }: {
+  keyword: string;
+  setKeyword: (value: string) => void;
+  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  error: string;
+  loading: boolean;
+  theme: "dark" | "light";
+  toggleTheme: () => void;
+}) {
+  const [visible, setVisible] = useState(false);
+  return <main className="landing-shell">
+    <header className="landing-nav"><Logo /><div className="landing-actions"><span className="landing-mode"><i className="live-dot" /> LOCAL SIMULATION</span><button className="theme" type="button" onClick={toggleTheme} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}><Icon name={theme === "dark" ? "sun" : "moon"} />{theme === "dark" ? "Light" : "Dark"}</button></div></header>
+    <section className="landing-layout">
+      <div className="landing-copy">
+        <span className="eyebrow">FINANCIAL INCIDENT RECONSTRUCTION</span>
+        <h1>Follow the evidence.<br /><em>Find the missing money.</em></h1>
+        <p className="landing-lede">A focused workspace for tracing payment events, spotting ledger discrepancies, and verifying safe recovery steps.</p>
+        <div className="landing-features">
+          <div><span className="feature-number">01</span><b>Trace</b><p>Connect payment events to immutable ledger records.</p></div>
+          <div><span className="feature-number">02</span><b>Understand</b><p>Compare evidence and inspect competing explanations.</p></div>
+          <div><span className="feature-number">03</span><b>Verify</b><p>Simulate a correction before sandbox approval.</p></div>
+        </div>
+        <div className="landing-proof"><span className="proof-rule" />USD LEDGER <span> / </span> TEMPORAL EVIDENCE <span> / </span> CONTROLLED RECOVERY</div>
+      </div>
+      <aside className="access-card" aria-labelledby="access-title">
+        <div className="access-icon"><Icon name="key" size={20} /></div>
+        <span className="eyebrow">DEMO WORKSPACE</span>
+        <h2 id="access-title">Enter with a keyword</h2>
+        <p className="access-intro">Use the local demo keyword to open the simulated operations console.</p>
+        <form onSubmit={onSubmit}>
+          <label htmlFor="workspace-keyword">Workspace keyword</label>
+          <div className="landing-key-input"><input id="workspace-keyword" value={keyword} onChange={event => setKeyword(event.target.value)} type={visible ? "text" : "password"} autoComplete="off" autoCapitalize="none" spellCheck={false} aria-describedby="access-key-help" required /><button type="button" onClick={() => setVisible(value => !value)} aria-label={visible ? "Hide keyword" : "Show keyword"}>{visible ? "Hide" : "Show"}</button></div>
+          <p id="access-key-help" className="access-key-hint">Demo keyword: <code>local-demo-approval</code></p>
+          <button className="landing-submit" type="submit" disabled={loading || !keyword.trim()}>{loading ? "Checking keyword..." : "Open demo workspace"}<span aria-hidden="true">-&gt;</span></button>
+          {error && <p className="access-error" role="alert">{error}</p>}
+        </form>
+        <div className="access-explainer" aria-label="How keyword access works">
+          <div className="access-step"><span>1</span><p><b>Keyword check</b><small>The API checks the configured demo keyword.</small></p></div>
+          <div className="access-step"><span>2</span><p><b>Local workspace</b><small>Access opens this generated simulation.</small></p></div>
+          <div className="access-security"><Icon name="check" size={14} /> Demo gate only. It is not account login or production authentication.</div>
+        </div>
+      </aside>
+    </section>
+    <footer className="landing-footer"><span>LEDGERLENS AI</span><span>NO LIVE PAYMENT RAILS CONNECTED</span></footer>
+  </main>;
 }

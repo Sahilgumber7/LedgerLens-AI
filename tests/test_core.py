@@ -74,4 +74,4 @@ def test_invalid_money_currency_and_reversal():
     with pytest.raises(DomainError):
         ledger.post("x", [Line("a", Side.DEBIT, -1), Line("b", Side.CREDIT, -1)])
     with pytest.raises(DomainError):
-        ledger.post("x", [Line("a", Side.DEBIT, 1, "USD"), Line("b", Side.CREDIT, 1, "USD")])
+        ledger.post("x", [Line("a", Side.DEBIT, 1, "INR"), Line("b", Side.CREDIT, 1, "INR")])

@@ -19,6 +19,6 @@ Store observed events as immutable records with occurrence and ingestion times, 
 
 ## Assumptions and unresolved questions
 
-The initial simulator uses INR integer paise and a simplified card-like authorization/capture/settlement flow. Fee and settlement behavior are synthetic. No bank account or external cash is represented as an internal asset. The current demo uses process-local state and is not concurrency safe across processes. Regulatory applicability, current RBI amendments, precise provider semantics, production accounting policies, and tenancy/authentication design require domain review before enforcement.
+The initial simulator uses USD integer cents and a simplified card-like authorization/capture/settlement flow. Fee and settlement behavior are synthetic. No bank account or external cash is represented as an internal asset. RBI references are retained as research context only; no India-specific regulatory rule is enforced by this USD demo. The current demo uses process-local state and is not concurrency safe across processes. Regulatory applicability, precise provider semantics, production accounting policies, and tenancy/authentication design require domain review before enforcement.
 
 Some requested URLs (full Razorpay docs, RBI site, Stripe docs) were searched/opened; authoritative claims above only reflect content returned by the linked primary documents. Hypothesis and Ruff are installed through the development lock, but property-based tests have not yet been written. Z3 and SimPy remain uninstalled/unintegrated.

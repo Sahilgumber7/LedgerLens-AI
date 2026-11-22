@@ -6,7 +6,7 @@ LedgerLens is a simulation-only financial incident reconstruction project. It se
 
 ## Current runnable slice
 
-- INR integer-minor-unit balanced journals, immutable records, idempotency conflict detection, compensating reversal.
+- USD integer-cent balanced journals, immutable records, idempotency conflict detection, compensating reversal.
 - Guarded payment state machine with settlement status independent.
 - Seeded duplicate-posting incident, detector, NetworkX evidence graph, evidence-citing deterministic diagnosis, and isolated recovery simulation.
 - FastAPI health/incident/evidence endpoints.
@@ -25,7 +25,7 @@ For the dashboard dependencies: `cd apps/dashboard && npm ci`
 - Tests: `uv run pytest` and `cd apps/dashboard && npm run test:e2e` (uses installed Microsoft Edge)
 - API docs: `http://127.0.0.1:8000/docs`
 
-All displayed amounts are generated simulation data. Sandbox approvals use a local demo keyword (`local-demo-approval` by default, overridable with `LEDGERLENS_APPROVAL_TOKEN`). This keyword is a demonstration gate, not account login or production authentication.
+All displayed amounts are generated USD simulation data. The landing page accepts a local demo workspace keyword (`local-demo-approval` by default, overridable with `LEDGERLENS_ACCESS_KEYWORD`); sandbox approvals use `LEDGERLENS_APPROVAL_TOKEN`. The workspace keyword only gates the frontend view. It is not account login or production authentication, and API financial endpoints are not protected by a user session.
 
 ## Architecture
 
