@@ -9,6 +9,7 @@
 - [ ] Provider-independent structured LLM tool caller and bounded traces.
 - [ ] Durable audit persistence and stronger approval identity beyond the local demo token.
 - [ ] FinOpsBench split/generation/evaluators and measured baselines.
+- [x] Narrow deterministic baseline scorecard with reproducible JSON/CSV/Markdown output (not FinOpsBench).
 - [x] API-backed Next.js first-view dashboard with evidence and sandbox recovery flow.
 - [x] API-backed operational overview charts, visible demo keyword explainer, audit activity, and responsive browser checks.
 - [x] Third-party dataset and related-project review with licensing/scope cautions.

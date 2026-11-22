@@ -72,3 +72,11 @@ No SQLAlchemy persistence/Alembic migrations or cross-process concurrency; no ac
 - Added Sora as a self-hosted variable WOFF2 from Google Fonts under its SIL Open Font License; kept a system sans-serif fallback and applied Sora across the landing and dashboard.
 - Added a browser font-load assertion. Dashboard lint/typecheck, optimized build, and all 4 Playwright tests passed after the font change.
 - Inspected the updated 1440x980 local screenshot.
+
+### Follow-up: verification score and system design guide (2026-11-22)
+
+- Added a deterministic baseline scorecard with equal-weight detection, root-cause, evidence-reference, counterfactual-integrity, and unsafe-repeat-reversal metrics. Paired fault/control cases vary seed and amount across one fault family.
+- Executed the 100-case run: composite score 100.00%; detector 100%, root-cause 100%, evidence-ID validity 100%, recovery simulation integrity 100%, unsafe reversal rejection 100%. This is explicitly a narrow rules smoke score, not an LLM or FinOpsBench result.
+- Score artifacts: `benchmarks/results/scorecard.json`, `.csv`, and `.md`; command: `uv run python benchmarks/scorecard.py --cases 50 --seed 73`.
+- Added scorecard determinism tests and `docs/SYSTEM_DESIGN_ONE_PAGER.md` describing the current architecture and trust boundaries.
+- Verification: `pytest` 10 passed; Ruff, dashboard lint/typecheck, production build, and all 4 Playwright tests passed. Docker build was not part of this run.

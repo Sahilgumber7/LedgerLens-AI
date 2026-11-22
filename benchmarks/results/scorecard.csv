@@ -1,0 +1,7 @@
+metric,score_percent,weight
+detector_balanced_accuracy,100.0,0.2
+root_cause_accuracy,100.0,0.2
+evidence_reference_validity,100.0,0.2
+recovery_simulation_integrity,100.0,0.2
+unsafe_reversal_rejection,100.0,0.2
+headline_score_percent,100.0,1.0

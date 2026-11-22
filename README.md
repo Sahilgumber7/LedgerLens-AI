@@ -34,3 +34,7 @@ See [architecture](docs/ARCHITECTURE.md), [financial model](docs/FINANCIAL_MODEL
 See [dataset and related-project review](docs/DATASETS_AND_RELATED_WORK.md) for sourced benchmark candidates, license cautions, and a recommendation for FinOpsBench. The dashboard's overview charts query the running API; its keyword field is a local sandbox demo gate, not account authentication.
 
 The landing page's visual hierarchy and workflow diagram are documented in [landing design notes](docs/LANDING_DESIGN.md).
+
+## Verification score
+
+Run `uv run python benchmarks/scorecard.py --cases 50 --seed 73` (or `make benchmark`) for the reproducible deterministic baseline scorecard. It writes JSON, CSV, and Markdown results under `benchmarks/results/`. The score covers only the implemented duplicate-ledger-posting scenario; it is not an AI accuracy claim. See the [system design one-pager](docs/SYSTEM_DESIGN_ONE_PAGER.md) and generated report for scope and metric definitions.

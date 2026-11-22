@@ -19,5 +19,5 @@ typecheck:
 	uv run python -m compileall -q apps/api/src
 	cd apps/dashboard && npx tsc --noEmit
 benchmark:
-	@echo "FinOpsBench evaluation is not implemented yet"
+	uv run python benchmarks/scorecard.py --cases 50 --seed 73 --output-dir benchmarks/results
 demo: simulate

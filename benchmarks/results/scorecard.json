@@ -1,0 +1,41 @@
+{
+  "composite_definition": "Arithmetic mean of the five listed percentage metrics; equal 20% weights.",
+  "counts": {
+    "cases_total": 100,
+    "evidence_references_total": 300,
+    "fault_cases": 50,
+    "fault_root_cause_correct": 50,
+    "healthy_control_cases": 50,
+    "journal_balance_checks_passed": 200,
+    "journal_balance_checks_total": 200,
+    "recovery_simulation_integrity_pass": 50,
+    "true_negative": 50,
+    "true_positive": 50,
+    "unsafe_reversal_rejected": 50,
+    "valid_evidence_references": 300
+  },
+  "generation": {
+    "amount_minor_formula": "100 + ((seed * 7919) mod 500000)",
+    "cases_per_class": 50,
+    "currency": "USD",
+    "fault_family_count": 1,
+    "seed_start": 73,
+    "source": "LedgerLens seeded duplicate-posting simulator"
+  },
+  "headline_score_percent": 100.0,
+  "limitations": [
+    "This is a deterministic rules baseline, not an LLM evaluation.",
+    "The cases vary seeds and amounts but cover only duplicate internal capture posting.",
+    "Evidence-reference validity checks that cited IDs exist; it does not judge semantic support.",
+    "The score is a project-defined smoke score, not a calibrated or industry-standard benchmark."
+  ],
+  "metrics": {
+    "detector_balanced_accuracy": 100.0,
+    "evidence_reference_validity": 100.0,
+    "recovery_simulation_integrity": 100.0,
+    "root_cause_accuracy": 100.0,
+    "unsafe_reversal_rejection": 100.0
+  },
+  "scorecard": "LedgerLens Deterministic Baseline Score",
+  "scorecard_version": 1
+}
