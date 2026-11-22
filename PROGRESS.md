@@ -53,3 +53,10 @@ No SQLAlchemy persistence/Alembic migrations or cross-process concurrency; no ac
 - Changed the modeled and displayed demo currency from INR to USD integer cents after user direction. Updated core validation, display formatting, sample docs, and tests together. Indian regulatory sources are research-only and no India-specific obligations are enforced against this USD demo.
 - Added workspace exit control and theme switching from the landing page.
 - Verification for this follow-up: Python suite 8 passed, Ruff passed, dashboard lint and TypeScript passed, optimized Next build passed, and 4 Playwright tests passed, including invalid/correct/configurable keyword, landing responsiveness, USD formatting, and sandbox approval. Live demo at `http://127.0.0.1:3000`; API at `http://127.0.0.1:8000`.
+
+### Follow-up: landing page visual and copy cleanup (2026-11-22)
+
+- Replaced broad promotional copy with short descriptions of the actual sample workflow.
+- Reworked the feature row into a three-stage diagram: read events, compare ledger, verify recovery. Raised landing headings, body text, form labels, and step labels; stacked the process for mobile.
+- Browser tests assert the process diagram and minimum body text size as well as landing/dashboard overflow at 320/375/768/1280px.
+- Verification: 8 Python tests, Ruff, dashboard lint/typecheck, and 4 Playwright tests passed. Inspected a local Edge screenshot at 1440x980.

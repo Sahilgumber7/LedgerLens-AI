@@ -321,21 +321,22 @@ function LandingPage({ keyword, setKeyword, onSubmit, error, loading, theme, tog
     <header className="landing-nav"><Logo /><div className="landing-actions"><span className="landing-mode"><i className="live-dot" /> LOCAL SIMULATION</span><button className="theme" type="button" onClick={toggleTheme} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}><Icon name={theme === "dark" ? "sun" : "moon"} />{theme === "dark" ? "Light" : "Dark"}</button></div></header>
     <section className="landing-layout">
       <div className="landing-copy">
-        <span className="eyebrow">FINANCIAL INCIDENT RECONSTRUCTION</span>
-        <h1>Follow the evidence.<br /><em>Find the missing money.</em></h1>
-        <p className="landing-lede">A focused workspace for tracing payment events, spotting ledger discrepancies, and verifying safe recovery steps.</p>
-        <div className="landing-features">
-          <div><span className="feature-number">01</span><b>Trace</b><p>Connect payment events to immutable ledger records.</p></div>
-          <div><span className="feature-number">02</span><b>Understand</b><p>Compare evidence and inspect competing explanations.</p></div>
-          <div><span className="feature-number">03</span><b>Verify</b><p>Simulate a correction before sandbox approval.</p></div>
+        <span className="eyebrow">PAYMENT OPERATIONS DEMO</span>
+        <h1>When payment records<br /><em>do not match.</em></h1>
+        <p className="landing-lede">Review payment events, compare them with ledger postings, then test a correction in a sandbox.</p>
+        <div className="process-diagram" aria-label="Incident review process: read events, compare the ledger, verify a recovery">
+          <div className="process-step"><span className="process-index">01</span><span className="process-icon"><Icon name="alert" size={22} /></span><b>Read events</b><p>Order, gateway, webhook</p></div>
+          <span className="process-link" aria-hidden="true"><i /></span>
+          <div className="process-step"><span className="process-index">02</span><span className="process-icon"><Icon name="card" size={22} /></span><b>Compare ledger</b><p>Captures and journal entries</p></div>
+          <span className="process-link" aria-hidden="true"><i /></span>
+          <div className="process-step"><span className="process-index">03</span><span className="process-icon"><Icon name="recovery" size={22} /></span><b>Verify recovery</b><p>Simulate, check, approve</p></div>
         </div>
-        <div className="landing-proof"><span className="proof-rule" />USD LEDGER <span> / </span> TEMPORAL EVIDENCE <span> / </span> CONTROLLED RECOVERY</div>
       </div>
       <aside className="access-card" aria-labelledby="access-title">
         <div className="access-icon"><Icon name="key" size={20} /></div>
         <span className="eyebrow">DEMO WORKSPACE</span>
         <h2 id="access-title">Enter with a keyword</h2>
-        <p className="access-intro">Use the local demo keyword to open the simulated operations console.</p>
+        <p className="access-intro">Enter the keyword to open the sample incident workspace.</p>
         <form onSubmit={onSubmit}>
           <label htmlFor="workspace-keyword">Workspace keyword</label>
           <div className="landing-key-input"><input id="workspace-keyword" value={keyword} onChange={event => setKeyword(event.target.value)} type={visible ? "text" : "password"} autoComplete="off" autoCapitalize="none" spellCheck={false} aria-describedby="access-key-help" required /><button type="button" onClick={() => setVisible(value => !value)} aria-label={visible ? "Hide keyword" : "Show keyword"}>{visible ? "Hide" : "Show"}</button></div>
@@ -346,10 +347,10 @@ function LandingPage({ keyword, setKeyword, onSubmit, error, loading, theme, tog
         <div className="access-explainer" aria-label="How keyword access works">
           <div className="access-step"><span>1</span><p><b>Keyword check</b><small>The API checks the configured demo keyword.</small></p></div>
           <div className="access-step"><span>2</span><p><b>Local workspace</b><small>Access opens this generated simulation.</small></p></div>
-          <div className="access-security"><Icon name="check" size={14} /> Demo gate only. It is not account login or production authentication.</div>
+          <div className="access-security"><Icon name="check" size={14} /> The keyword opens this demo page only. API endpoints are not protected by it.</div>
         </div>
       </aside>
     </section>
-    <footer className="landing-footer"><span>LEDGERLENS AI</span><span>NO LIVE PAYMENT RAILS CONNECTED</span></footer>
+    <footer className="landing-footer"><span>LEDGERLENS</span><span>SYNTHETIC DATA. NO PAYMENTS ARE SENT.</span></footer>
   </main>;
 }
