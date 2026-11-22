@@ -74,6 +74,7 @@ test("landing page explains and checks the demo keyword", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("img", { name: "LedgerLens mark" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Payment records do not match." })).toBeVisible();
+  await expect.poll(() => page.evaluate(() => document.fonts.check("16px Sora"))).toBe(true);
   await expect(page.getByLabel("Incident review process: read events, compare the ledger, verify a recovery")).toBeVisible();
   await expect(page.locator(".process-step")).toHaveCount(3);
   await expect(page.locator(".brand-lockup small")).toHaveCount(0);
@@ -92,9 +93,15 @@ test("landing page explains and checks the demo keyword", async ({ page }) => {
 
 test("layout remains within the viewport from mobile to desktop", async ({ page }) => {
   await stubApi(page);
+  let opened = false;
   for (const width of [320, 375, 768, 1280]) {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("/");
+    if (!opened) {
+      await page.goto("/");
+      opened = true;
+    } else {
+      await page.getByRole("button", { name: "Exit demo" }).click();
+    }
     const landingDimensions = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }));
     expect(landingDimensions.document, "landing overflow at " + width + "px").toBeLessThanOrEqual(landingDimensions.viewport);
     await enterWorkspace(page);

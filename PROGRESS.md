@@ -66,3 +66,9 @@ No SQLAlchemy persistence/Alembic migrations or cross-process concurrency; no ac
 - Reviewed Nielsen Norman Group visual hierarchy guidance, Figma landing-page examples, and Stripe's numbered payment-flow explainer. Recorded the references and design decisions in `docs/LANDING_DESIGN.md`.
 - Removed the secondary descriptor beneath the logo. Simplified the heading to "Payment records do not match," removed generic copy, and kept one visual three-step process beside the workspace keyword form.
 - Enlarged process labels and simplified the steps to review events, compare the ledger, and test recovery. Browser coverage checks the visual, readable body text, and responsive widths.
+
+### Follow-up: Sora typography (2026-11-22)
+
+- Added Sora as a self-hosted variable WOFF2 from Google Fonts under its SIL Open Font License; kept a system sans-serif fallback and applied Sora across the landing and dashboard.
+- Added a browser font-load assertion. Dashboard lint/typecheck, optimized build, and all 4 Playwright tests passed after the font change.
+- Inspected the updated 1440x980 local screenshot.

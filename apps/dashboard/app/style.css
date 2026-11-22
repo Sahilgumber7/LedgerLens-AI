@@ -30,7 +30,7 @@
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 "Segoe UI", Arial, sans-serif; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 var(--font-sora), "Segoe UI", Arial, sans-serif; }
 button, input { font: inherit; }
 button:focus-visible, input:focus-visible, a:focus-visible, [tabindex="0"]:focus-visible { outline: 3px solid #58a8ed; outline-offset: 3px; }
 main { min-height: 100vh; display: grid; grid-template-columns: 232px minmax(0, 1fr); }
@@ -50,7 +50,7 @@ main { min-height: 100vh; display: grid; grid-template-columns: 232px minmax(0, 
 .sidebar nav a b, .sidebar nav a small { margin-left: auto; color: var(--faint); font: 10px "Consolas", monospace; }
 .sidebar nav .planned-nav { min-height: 40px; display: flex; align-items: center; gap: 10px; padding: 8px 10px; color: var(--faint); font-size: 12px; opacity: .72; }
 .sidefoot { margin-top: auto; padding: 15px 7px 0; border-top: 1px solid var(--line); color: var(--muted); font: 9px/1.8 "Consolas", monospace; letter-spacing: .3px; }
-.sidefoot strong { display: block; color: var(--text); font: 11px/1.8 "Segoe UI", Arial, sans-serif; letter-spacing: 0; }
+.sidefoot strong { display: block; color: var(--text); font: 11px/1.8 var(--font-sora), "Segoe UI", Arial, sans-serif; letter-spacing: 0; }
 .live-dot, .status-dot { display: inline-block; width: 7px; height: 7px; margin-right: 5px; border-radius: 50%; background: var(--green); vertical-align: 1px; }
 .content { width: 100%; max-width: 1520px; min-width: 0; margin: 0 auto; padding: 28px clamp(18px, 3.2vw, 46px); }
 header, .sectionhead { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
