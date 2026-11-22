@@ -22,10 +22,10 @@ For the dashboard dependencies: `cd apps/dashboard && npm ci`
 - Demo: `uv run python -m ledgerlens.demo`
 - Full local UI: `docker compose up --build` (API on `:8000`, dashboard on `:3000`)
 - API: `uv run uvicorn ledgerlens.api:app --app-dir apps/api/src --reload`
-- Tests: `uv run pytest`
+- Tests: `uv run pytest` and `cd apps/dashboard && npm run test:e2e` (uses installed Microsoft Edge)
 - API docs: `http://127.0.0.1:8000/docs`
 
-All displayed amounts are generated simulation data. Sandbox approvals use `LEDGERLENS_APPROVAL_TOKEN` (compose defaults to `local-demo-approval` for local demos); this is not an authentication design for shared or production environments.
+All displayed amounts are generated simulation data. Sandbox approvals use a local demo keyword (`local-demo-approval` by default, overridable with `LEDGERLENS_APPROVAL_TOKEN`). This keyword is a demonstration gate, not account login or production authentication.
 
 ## Architecture
 

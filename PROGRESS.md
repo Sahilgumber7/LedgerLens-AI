@@ -12,7 +12,9 @@ Created the monorepo under `coding/projects/LedgerLens`; reviewed the reference 
 - One seeded duplicate-posting scenario, deterministic detector, NetworkX evidence graph, and rule-based competing hypotheses with explicit uncertainty.
 - Counterfactual reversal in a deep-copied ledger; test verifies corrected balances and unchanged source ledger.
 - FastAPI health, incidents, evidence, deterministic investigation, recovery proposal/simulation/approval/execution, and audit endpoints. Sandbox approval token, stale-version rejection (covered by the API test), duplicate execution guard, and simulated-only financial effect. Evidence graph includes internal journal nodes; same-timestamp records are not ordered. State is process-local and resets on restart.
-- Next.js operations page reads incident/evidence/diagnosis APIs and supports local theme toggle plus sandbox recovery flow.
+- Next.js operations page reads incident/evidence/diagnosis APIs, supports persisted light/dark themes, uses inline SVG icons and locale-formatted INR, and shows the keyword approval explanation beside the sandbox action.
+- Added UTF-8/LF editor settings and replaced corrupted placeholder symbols.
+- Added Playwright browser tests for overflow at 320/375/768/1280px, mobile table scrolling, rendered rupee symbol, light theme colors, and the local keyword approval flow.
 - Dockerfiles and compose configuration; compose config parses successfully.
 - `uv.lock` and dashboard `package-lock.json`.
 
@@ -22,6 +24,7 @@ Created the monorepo under `coding/projects/LedgerLens`; reviewed the reference 
 - `uv run ruff check apps/api/src tests`: **All checks passed**.
 - `python -m ledgerlens.demo`: completed and printed incident, evidence-linked diagnosis, and recovery simulation JSON.
 - Dashboard `npm run build`: passed; `npm run lint`: passed; `npx tsc --noEmit`: passed; `npm audit`: **0 vulnerabilities**.
+- Dashboard `npm run test:e2e`: **3 passed** in installed Microsoft Edge at 320px, 375px, 768px, and 1280px; assertions cover viewport overflow, internal table scrolling, INR glyph, theme colors, and approval flow.
 - `docker compose config --quiet`: passed. `docker compose build` could not run because Docker Desktop Linux engine was not running (missing Docker API named pipe); container images are unverified.
 
 ### Not implemented / not claimed

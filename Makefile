@@ -11,6 +11,7 @@ simulate:
 	uv run python -m ledgerlens.demo
 test:
 	uv run pytest
+	cd apps/dashboard && npm run test:e2e
 lint:
 	uv run ruff check apps/api/src tests
 	cd apps/dashboard && npm run lint

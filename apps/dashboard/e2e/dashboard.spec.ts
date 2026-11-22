@@ -1,0 +1,98 @@
+import { expect, test } from "@playwright/test";
+
+const incident = {
+  id: "inc_test_001",
+  payment_id: "pay_test_001",
+  severity: "high",
+  exposure_minor: 12345,
+  evidence_ids: ["evt_capture_1"],
+  journal_ids: ["jrnl_test_002"],
+  status: "open",
+};
+
+async function stubApi(page: import("@playwright/test").Page) {
+  await page.route("**/api/v1/incidents", route =>
+    route.fulfill({ json: { data: "generated simulation", items: [incident] } }),
+  );
+  await page.route("**/api/v1/incidents/*/evidence", route =>
+    route.fulfill({
+      json: {
+        nodes: [
+          { id: "evt_capture_1", type: "event", event_type: "payment.captured", source: "gateway" },
+        ],
+        edges: [],
+      },
+    }),
+  );
+  await page.route("**/api/v1/incidents/*/investigate", route =>
+    route.fulfill({
+      json: {
+        engine: "deterministic_rules_v1",
+        root_cause: "duplicate_internal_posting",
+        summary: "An extra capture posting was detected.",
+        uncertainty: "The upstream cause is not established.",
+        observed_facts: [{ claim: "Posting count mismatch", evidence_ids: ["evt_capture_1"] }],
+      },
+    }),
+  );
+  await page.route("**/api/v1/recoveries", route =>
+    route.fulfill({ status: 201, json: { id: "rec_test_001" } }),
+  );
+  await page.route("**/api/v1/recoveries/rec_test_001/simulate", route =>
+    route.fulfill({ json: { status: "verified_simulation_only" } }),
+  );
+  await page.route("**/api/v1/recoveries/rec_test_001/approve", async route => {
+    expect(route.request().headers()["x-approval-token"]).toBe("local-demo-approval");
+    await route.fulfill({ json: { status: "approved" } });
+  });
+  await page.route("**/api/v1/recoveries/rec_test_001/execute", route =>
+    route.fulfill({ json: { status: "executed_in_sandbox", journal_id: "jrnl_sandbox_003" } }),
+  );
+}
+
+test("layout remains within the viewport from mobile to desktop", async ({ page }) => {
+  await stubApi(page);
+  for (const width of [320, 375, 768, 1280]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    await expect(page.getByRole("heading", { name: "Incident investigation" })).toBeVisible();
+    await expect(page.locator("tbody")).toContainText("\u20B9" + "123.45");
+    const dimensions = await page.evaluate(() => ({
+      viewport: window.innerWidth,
+      document: document.documentElement.scrollWidth,
+    }));
+    expect(dimensions.document, "document overflow at " + width + "px").toBeLessThanOrEqual(dimensions.viewport);
+  }
+  await page.setViewportSize({ width: 375, height: 812 });
+  const table = page.getByRole("region", { name: "Open incidents table" });
+  expect(await table.evaluate(element => element.scrollWidth)).toBeGreaterThan(
+    await table.evaluate(element => element.clientWidth),
+  );
+});
+
+test("theme toggle preserves readable light mode", async ({ page }) => {
+  await stubApi(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/");
+  const toggle = page.getByRole("button", { name: "Switch to light theme" });
+  await toggle.click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await expect(page.getByRole("heading", { name: "Open incidents" })).toBeVisible();
+  const lightBackground = await page.locator("body").evaluate(element => getComputedStyle(element).backgroundColor);
+  expect(lightBackground).toBe("rgb(243, 245, 247)");
+  await page.getByRole("button", { name: "Switch to dark theme" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+});
+
+test("demo keyword approval explains its sandbox boundary", async ({ page }) => {
+  await stubApi(page);
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Simulate proposed reversal" }).click();
+  await expect(page.getByLabel("How demo keyword approval works")).toBeVisible();
+  await expect(page.getByText("not account login, identity verification, or production-grade authorization.")).toBeVisible();
+  const keyword = page.getByLabel("Local demo approval keyword");
+  await expect(keyword).toHaveValue("local-demo-approval");
+  await page.getByRole("button", { name: "Verify keyword & execute in sandbox" }).click();
+  await expect(page.getByRole("status")).toContainText("jrnl_sandbox_003");
+});

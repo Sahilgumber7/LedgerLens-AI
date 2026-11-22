@@ -151,7 +151,11 @@ def approve(recovery_id: str, x_approval_token: str | None = Header(default=None
         r = recoveries.get(recovery_id)
         if not r:
             raise HTTPException(404, "recovery not found")
-        expected = os.getenv("LEDGERLENS_APPROVAL_TOKEN")
+        expected = os.getenv("LEDGERLENS_APPROVAL_TOKEN") or (
+            "local-demo-approval"
+            if os.getenv("LEDGERLENS_MODE", "simulation") == "simulation"
+            else None
+        )
         if not expected:
             raise HTTPException(
                 503, "sandbox approval is disabled; configure LEDGERLENS_APPROVAL_TOKEN"

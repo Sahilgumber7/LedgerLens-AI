@@ -20,7 +20,7 @@ def test_health_and_incident_evidence_api():
 
 def test_approval_gated_sandbox_recovery(monkeypatch):
     c = TestClient(app)
-    monkeypatch.setenv("LEDGERLENS_APPROVAL_TOKEN", "local-test-secret")
+    monkeypatch.delenv("LEDGERLENS_APPROVAL_TOKEN", raising=False)
     original_count = len(ledger.journals)
     target = ledger.journals[-1].id
     created = c.post(
@@ -40,7 +40,7 @@ def test_approval_gated_sandbox_recovery(monkeypatch):
     )
     assert (
         c.post(
-            f"/api/v1/recoveries/{rid}/approve", headers={"X-Approval-Token": "local-test-secret"}
+            f"/api/v1/recoveries/{rid}/approve", headers={"X-Approval-Token": "local-demo-approval"}
         ).status_code
         == 200
     )
@@ -53,7 +53,7 @@ def test_approval_gated_sandbox_recovery(monkeypatch):
     assert c.post(f"/api/v1/recoveries/{rid}/simulate").status_code == 200
     assert (
         c.post(
-            f"/api/v1/recoveries/{rid}/approve", headers={"X-Approval-Token": "local-test-secret"}
+            f"/api/v1/recoveries/{rid}/approve", headers={"X-Approval-Token": "local-demo-approval"}
         ).status_code
         == 200
     )
