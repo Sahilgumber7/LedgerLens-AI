@@ -1,8 +1,8 @@
-# LedgerLens AI + FinOpsBench
+# Tracewire | Payment investigation agents
 
 **Find where money got stuck. Understand why. Verify the recovery.**
 
-LedgerLens is a simulation-only financial incident reconstruction project. It separates financial authority from AI: deterministic accounting, state transitions and invariant checks own truth; an eventual investigator may only propose evidence-backed explanations and actions. No real funds can be moved.
+Tracewire (repository: LedgerLens) is a simulation-only financial incident reconstruction project. It separates financial authority from AI: deterministic accounting, state transitions and invariant checks own truth; deterministic monitors detect the current seeded anomaly. Task-specific AI investigators are not connected yet. No real funds can be moved.
 
 ## Current runnable slice
 

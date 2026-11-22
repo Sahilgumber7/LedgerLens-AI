@@ -14,7 +14,8 @@
 - [x] API-backed operational overview charts, visible demo keyword explainer, audit activity, and responsive browser checks.
 - [x] Third-party dataset and related-project review with licensing/scope cautions.
 - [x] Branded landing page, API-checked demo keyword entry, USD display/model, and workspace exit control.
-- [ ] Remaining operational pages (payment explorer, full incident workspace, benchmark and audit history).
+- [x] Separate API-backed routes for overview, fraud/payment alerts, payment observations, sandbox recovery, audit, and the measured deterministic scorecard.
+- [x] Shared workspace navigation, route gating with the demo keyword, responsive mobile navigation, and page-level empty/error states.
 - [x] Docker Compose/Dockerfiles and initial project docs (container runtime not verified).
 - [ ] CI and independently reproducible benchmark.
 

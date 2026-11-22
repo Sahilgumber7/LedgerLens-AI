@@ -9,5 +9,5 @@ const sora = localFont({
   weight: "400 700",
 });
 
-export const metadata: Metadata = { title: "LedgerLens | Financial incident operations", description: "Trace payment evidence, investigate ledger discrepancies, and verify sandbox recovery." };
+export const metadata: Metadata = { title: "Tracewire | Payment investigation agents", description: "Specialized agents track payment anomalies, trace evidence, and verify sandbox recovery." };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en"><body className={sora.variable}>{children}</body></html>; }

@@ -80,3 +80,12 @@ No SQLAlchemy persistence/Alembic migrations or cross-process concurrency; no ac
 - Score artifacts: `benchmarks/results/scorecard.json`, `.csv`, and `.md`; command: `uv run python benchmarks/scorecard.py --cases 50 --seed 73`.
 - Added scorecard determinism tests and `docs/SYSTEM_DESIGN_ONE_PAGER.md` describing the current architecture and trust boundaries.
 - Verification: `pytest` 10 passed; Ruff, dashboard lint/typecheck, production build, and all 4 Playwright tests passed. Docker build was not part of this run.
+
+### Follow-up: separate workspace pages and Tracewire branding (2026-11-22)
+
+- Replaced the single long workspace view with distinct `/overview`, `/incidents`, `/payments`, `/recovery`, `/audit`, and `/benchmarks` routes under a shared responsive navigation shell. Keyword entry now opens Overview and route access is kept in the current browser session.
+- Reframed the product as **Tracewire**, focused on task-specific payment investigation. Current behavior is described accurately as deterministic monitors and rules; the UI states no AI model is connected. The alert language does not claim that a detected ledger anomaly proves fraud.
+- Added a read-only payments endpoint reconstructed from seeded events and internal journals. It explicitly reports no settlement observation when none exists. Added a benchmark endpoint serving only the checked-in deterministic smoke scorecard, with its single-fault-family limitation visible in the UI.
+- Added route navigation, API observation, keyword recovery, and mobile table checks. Publicly served the system design one-pager from the benchmark page.
+- Latest verification: 12 Python tests passed; Ruff passed; dashboard lint and TypeScript passed; optimized Next build produced all six workspace routes; Playwright 4 passed after a mobile-specific table overflow assertion adjustment. Real payment/settlement integrations and LLM agents remain unimplemented.
+- Started the updated API and production dashboard locally; `/api/v1/payments` and `/api/v1/benchmarks` returned expected data, and `/benchmarks` returned HTTP 200. Docker image build could not run because Docker Desktop's Linux engine was not available.

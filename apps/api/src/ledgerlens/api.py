@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 import os
+import json
 import secrets
 import threading
+from pathlib import Path
 from uuid import uuid4
 from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,7 +25,7 @@ from .core import (
 )
 
 app = FastAPI(
-    title="LedgerLens AI API",
+    title="Tracewire API",
     version="0.1.0",
     description="Simulation-only financial incident reconstruction",
 )
@@ -97,6 +99,29 @@ def incidents():
             "data": "generated simulation",
             "items": [{**item.__dict__, "journal_ids": item.journal_ids} for item in current],
         }
+
+
+@app.get("/api/v1/payments")
+def payments():
+    """Return payment observations reconstructed from the generated event stream."""
+    with lock:
+        payment_ids = sorted({event.payment_id for event in scenario.events})
+        items = []
+        for payment_id in payment_ids:
+            events = [event for event in scenario.events if event.payment_id == payment_id]
+            journals = [journal for journal in ledger.journals if payment_id in journal.idempotency_key]
+            amounts = [event.payload.get("amount_minor") for event in events if isinstance(event.payload.get("amount_minor"), int)]
+            items.append({
+                "id": payment_id,
+                "observed_state": events[-1].event_type if events else "unknown",
+                "amount_minor": amounts[-1] if amounts else None,
+                "currency": "USD",
+                "event_count": len(events),
+                "journal_ids": [journal.id for journal in journals],
+                "settlement_observation": None,
+                "data_origin": "generated simulation observations",
+            })
+        return {"items": items}
 
 
 @app.get("/api/v1/overview")
@@ -268,3 +293,17 @@ def execute(recovery_id: str):
 def get_audit():
     with lock:
         return {"items": list(audit)}
+
+
+@app.get("/api/v1/benchmarks")
+def get_benchmark_scorecard():
+    """Serve the checked-in deterministic baseline scorecard, if packaged."""
+    candidates = [
+        Path.cwd() / "benchmarks/results/scorecard.json",
+        Path(__file__).resolve().parents[4] / "benchmarks/results/scorecard.json",
+        Path(__file__).resolve().parents[3] / "benchmarks/results/scorecard.json",
+    ]
+    path = next((candidate for candidate in candidates if candidate.is_file()), None)
+    if path is None:
+        raise HTTPException(404, "benchmark scorecard is not packaged")
+    return json.loads(path.read_text(encoding="utf-8"))

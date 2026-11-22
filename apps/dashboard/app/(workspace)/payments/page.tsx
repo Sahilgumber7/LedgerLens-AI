@@ -1,0 +1,9 @@
+"use client";
+import { useEffect, useState } from "react";
+import { api, usd } from "../../components";
+type Payment = { id: string; observed_state: string; amount_minor: number | null; currency: string; event_count: number; journal_ids: string[]; settlement_observation: string | null; data_origin: string };
+export default function PaymentsPage() {
+ const [items, setItems] = useState<Payment[]>([]); const [error, setError] = useState("");
+ useEffect(() => { fetch(`${api}/api/v1/payments`).then(r => { if (!r.ok) throw new Error(); return r.json(); }).then(d => setItems(d.items)).catch(() => setError("Payment observations could not be loaded. Check that the API is running.")); }, []);
+ return <><section className="page-intro"><span className="eyebrow">PAYMENT EXPLORER</span><h2>Observed payment records</h2><p>Payment state below is reconstructed from simulator events. Settlement appears only when a settlement observation exists.</p></section>{error && <p className="error" role="alert">{error}</p>}<div className="tablewrap" role="region" aria-label="Payments table" tabIndex={0}><table><caption className="sr-only">Observed simulated payment events and internal journal references</caption><thead><tr><th>PAYMENT</th><th>OBSERVED EVENT</th><th>AMOUNT</th><th>SETTLEMENT OBSERVATION</th><th>EVENTS</th><th>JOURNALS</th></tr></thead><tbody>{items.length === 0 && !error && <tr><td className="empty" colSpan={6}>Loading payment observations…</td></tr>}{items.map(p => <tr key={p.id}><td className="mono">{p.id}</td><td><span className="tag">{p.observed_state}</span></td><td className="mono">{p.amount_minor === null ? "Not observed" : usd.format(p.amount_minor / 100)}</td><td>{p.settlement_observation ?? "No record"}</td><td>{p.event_count}</td><td className="mono">{p.journal_ids.join(", ") || "No journal"}</td></tr>)}</tbody></table></div><p className="caption">Amounts and states are simulation observations, not external bank confirmations.</p></>;
+}

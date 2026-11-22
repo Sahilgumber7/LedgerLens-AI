@@ -1,8 +1,8 @@
-# LedgerLens system design: one-page guide
+# Tracewire system design: one-page guide
 
 ## What it does
 
-LedgerLens is a local, simulation-only incident review application. It creates payment events and internal journal records, detects a duplicate capture posting, shows connected evidence, and lets a user simulate and approve a compensating entry in an in-memory ledger. It does not call a real payment provider or move funds. The investigator is deterministic Python rules today; there is no LLM integration.
+Tracewire (repository: LedgerLens) is a local, simulation-only incident review application. It creates payment events and internal journal records, detects a duplicate capture posting, shows connected evidence, and lets a user simulate and approve a compensating entry in an in-memory ledger. It does not call a real payment provider or move funds. The current monitoring and investigation use deterministic Python rules; task-specific AI agents are not connected.
 
 ## Main path
 

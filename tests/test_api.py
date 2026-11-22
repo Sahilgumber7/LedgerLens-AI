@@ -26,6 +26,27 @@ def test_health_and_incident_evidence_api():
     assert c.get("/api/v1/incidents/unknown/evidence").status_code == 404
 
 
+def test_payment_explorer_returns_simulator_observations_only():
+    response = TestClient(app).get("/api/v1/payments")
+    assert response.status_code == 200
+    payment = response.json()["items"][0]
+    assert payment["id"] == "pay_demo_001"
+    assert payment["amount_minor"] == 12500
+    assert payment["currency"] == "USD"
+    assert payment["settlement_observation"] is None
+    assert payment["journal_ids"]
+    assert payment["data_origin"] == "generated simulation observations"
+
+
+def test_benchmark_endpoint_serves_measured_scorecard():
+    response = TestClient(app).get("/api/v1/benchmarks")
+    assert response.status_code == 200
+    result = response.json()
+    assert result["scorecard"] == "LedgerLens Deterministic Baseline Score"
+    assert result["counts"]["cases_total"] == 100
+    assert result["generation"]["fault_family_count"] == 1
+
+
 def test_workspace_keyword_can_be_configured(monkeypatch):
     c = TestClient(app)
     monkeypatch.setenv("LEDGERLENS_ACCESS_KEYWORD", "test-workspace-key")
