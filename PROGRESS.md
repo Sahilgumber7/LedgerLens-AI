@@ -1,0 +1,35 @@
+# Progress
+
+## Current checkpoint (2026-11-22)
+
+Created the monorepo under `coding/projects/LedgerLens`; reviewed the reference `support-llm-3b` project; researched official payment, accounting, and RBI sources; documented findings and decisions.
+
+### Implemented and verified
+
+- Integer paise INR double-entry journal with balancing, account/currency validation, immutable records, process-local idempotency conflict detection, and compensating entries.
+- Payment transition guard and separate settlement status field.
+- Append-only event dataclasses with occurrence/ingestion time and provenance fields.
+- One seeded duplicate-posting scenario, deterministic detector, NetworkX evidence graph, and rule-based competing hypotheses with explicit uncertainty.
+- Counterfactual reversal in a deep-copied ledger; test verifies corrected balances and unchanged source ledger.
+- FastAPI health, incidents, evidence, deterministic investigation, recovery proposal/simulation/approval/execution, and audit endpoints. Sandbox approval token, stale-version rejection (covered by the API test), duplicate execution guard, and simulated-only financial effect. Evidence graph includes internal journal nodes; same-timestamp records are not ordered. State is process-local and resets on restart.
+- Next.js operations page reads incident/evidence/diagnosis APIs and supports local theme toggle plus sandbox recovery flow.
+- Dockerfiles and compose configuration; compose config parses successfully.
+- `uv.lock` and dashboard `package-lock.json`.
+
+### Actual verification output
+
+- `uv run pytest -q`: **7 passed** (one upstream Starlette deprecation warning).
+- `uv run ruff check apps/api/src tests`: **All checks passed**.
+- `python -m ledgerlens.demo`: completed and printed incident, evidence-linked diagnosis, and recovery simulation JSON.
+- Dashboard `npm run build`: passed; `npm run lint`: passed; `npx tsc --noEmit`: passed; `npm audit`: **0 vulnerabilities**.
+- `docker compose config --quiet`: passed. `docker compose build` could not run because Docker Desktop Linux engine was not running (missing Docker API named pipe); container images are unverified.
+
+### Not implemented / not claimed
+
+No SQLAlchemy persistence/Alembic migrations or cross-process concurrency; no actual LLM provider or AI tool-calling agent; no Hypothesis properties despite the dev dependency; no Z3/SimPy integration; only one fault family; no FinOpsBench dataset/evaluation; no RBI executable rules; no full payment explorer/metrics/audit UI; no CI. Hosted model integration and production auth are absent. Docker build/runtime is unverified. No benchmark results or model accuracy claims.
+
+### Next actions
+
+1. Implement database models, migrations, unique idempotency constraints, and transactional storage; test concurrent duplicate posts and restart replay.
+2. Add typed provider-independent structured tool calling with budgets, prompt-injection-safe tool outputs, and deterministic mock provider tests.
+3. Add multiple scenario families and FinOpsBench split/evaluators, then connect all displayed UI data and recovery history to durable API queries.

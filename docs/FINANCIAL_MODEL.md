@@ -1,0 +1,3 @@
+# Financial model
+
+A posted journal transaction contains at least two lines, all denominated in INR, with positive integer paise amounts and equal total debits/credits. Account types: asset, liability, revenue, expense, and clearing. Processor-held funds and merchant payable are internal modeled accounts; a simulated bank statement is an external observation and is not booked as bank cash. Capture example: debit processor clearing, credit merchant payable (fee treatment omitted). A later settlement would debit merchant payable and credit settlement-in-transit only after explicit modeled policy; external bank balance remains external evidence. Reversals use opposite postings with a reference to the original.
