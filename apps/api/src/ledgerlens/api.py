@@ -74,9 +74,41 @@ def health():
 @app.get("/api/v1/incidents")
 def incidents():
     with lock:
+        current = detect_incidents(scenario, ledger)
         return {
             "data": "generated simulation",
-            "items": [{**incident.__dict__, "journal_ids": incident.journal_ids}],
+            "items": [{**item.__dict__, "journal_ids": item.journal_ids} for item in current],
+        }
+
+
+@app.get("/api/v1/overview")
+def overview():
+    """Aggregate operational metrics from the current in-memory simulation state."""
+    with lock:
+        current = detect_incidents(scenario, ledger)
+        sources: dict[str, int] = {}
+        event_types: dict[str, int] = {}
+        for event in scenario.events:
+            sources[event.source] = sources.get(event.source, 0) + 1
+            event_types[event.event_type] = event_types.get(event.event_type, 0) + 1
+        severities: dict[str, int] = {}
+        for item in current:
+            severities[item.severity] = severities.get(item.severity, 0) + 1
+        return {
+            "data_origin": "generated simulation",
+            "open_incidents": len(current),
+            "affected_payments": len({item.payment_id for item in current}),
+            "suspected_exposure_minor": sum(item.exposure_minor for item in current),
+            "verified_loss_minor": None,
+            "severity_counts": severities,
+            "event_source_counts": sources,
+            "event_type_counts": event_types,
+            "event_count": len(scenario.events),
+            "journal_count": len(ledger.journals),
+            "ledger_version": len(ledger.journals),
+            "account_balances_minor": {
+                account_id: ledger.balance(account_id) for account_id in ledger.accounts
+            },
         }
 
 

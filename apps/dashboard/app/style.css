@@ -82,6 +82,36 @@ tbody tr:last-child td { border-bottom: 0; }
 .open { color: var(--amber); font: 10px "Consolas", monospace; text-transform: capitalize; }
 .status-dot { width: 6px; height: 6px; background: var(--amber); }
 .workspace-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; margin-top: 23px; }
+.visual-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: 13px; margin: 0 0 26px; }
+.viz-card, .audit-panel { min-width: 0; padding: 17px; border: 1px solid var(--line); background: var(--panel); box-shadow: var(--shadow); }
+.bar-chart { display: grid; gap: 12px; padding: 8px 0; }
+.bar-row { display: grid; grid-template-columns: 92px minmax(30px, 1fr) 24px; align-items: center; gap: 10px; color: var(--muted); font: 10px "Consolas", monospace; }
+.bar-row > span { overflow-wrap: anywhere; }
+.bar-row > b { color: var(--text); text-align: right; }
+.bar-track { height: 9px; overflow: hidden; background: var(--panel-raised); border-radius: 2px; }
+.bar-track i { display: block; height: 100%; background: linear-gradient(90deg, #287a59, #6bc69a); transform-origin: left; animation: grow .5s ease both; }
+@keyframes grow { from { transform: scaleX(.05); } to { transform: scaleX(1); } }
+.viz-note { margin: 11px 0 0; color: var(--faint); font-size: 10px; }
+.severity-visual { min-height: 140px; display: flex; align-items: center; justify-content: center; gap: clamp(18px, 5vw, 55px); }
+.donut { width: 112px; height: 112px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%; background: conic-gradient(var(--amber) 0 var(--severity-share), var(--line) var(--severity-share) 100%); position: relative; }
+.donut::before { content: ""; position: absolute; inset: 10px; border-radius: 50%; background: var(--panel); }
+.donut span { z-index: 1; display: grid; text-align: center; }
+.donut b { font: 23px "Consolas", monospace; }
+.donut small { color: var(--muted); font-size: 9px; }
+.legend { min-width: 100px; display: grid; gap: 9px; }
+.legend > div { display: grid; grid-template-columns: 8px 1fr auto; align-items: center; gap: 8px; color: var(--muted); font-size: 10px; text-transform: capitalize; }
+.legend b { color: var(--text); }
+.legend-dot { width: 8px; height: 8px; display: inline-block; border-radius: 50%; background: var(--amber); }
+.legend-dot.medium { background: #5d9ccc; }
+.legend-dot.low { background: var(--green); }
+.metric-strip { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--line); color: var(--muted); font-size: 9px; }
+.metric-strip b { display: block; margin-top: 3px; color: var(--text); font: 11px "Consolas", monospace; }
+.audit-panel { margin-top: 22px; }
+.audit-list { display: grid; }
+.audit-list > div { min-width: 0; display: grid; grid-template-columns: 22px minmax(80px, auto) minmax(70px, 1fr) minmax(90px, 1fr); align-items: center; gap: 9px; padding: 10px 0; border-top: 1px solid var(--line); }
+.audit-list b { font-size: 10px; text-transform: capitalize; }
+.audit-list code, .audit-list small { overflow-wrap: anywhere; color: var(--muted); font-size: 9px; }
+.audit-mark { width: 20px; height: 20px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; color: var(--green); }
 .workspace-grid article { min-width: 0; padding: 16px; border: 1px solid var(--line); background: var(--panel); box-shadow: var(--shadow); }
 .workspace-grid article h2 { overflow-wrap: anywhere; }
 .tag { min-height: 26px; font-size: 9px; }
@@ -94,6 +124,17 @@ tbody tr:last-child td { border-bottom: 0; }
 .event small { overflow-wrap: anywhere; color: var(--muted); font-size: 10px; }
 .event code { overflow-wrap: anywhere; }
 .event-marker { width: 8px; height: 8px; flex: 0 0 auto; border: 1px solid var(--green); border-radius: 50%; }
+.graph-wrap { margin: 12px 0 18px; padding: 8px; border: 1px solid var(--line); background: var(--panel-raised); }
+.graph-wrap svg { width: 100%; height: auto; max-height: 220px; overflow: visible; }
+.graph-edge { stroke: var(--faint); stroke-width: 1.1; opacity: .65; }
+.graph-edge.inferred { stroke-dasharray: 4 4; }
+.graph-point { fill: var(--panel); stroke: var(--green); stroke-width: 2; }
+.graph-point.incident { stroke: var(--amber); }
+.graph-point.ledger_entry { stroke: #69a8d6; }
+.graph-wrap text { fill: var(--muted); font: 8px "Consolas", monospace; }
+.graph-note { display: flex; flex-wrap: wrap; gap: 7px 13px; padding-top: 7px; border-top: 1px solid var(--line); color: var(--muted); font-size: 8px; }
+.graph-note span:first-child { display: inline-flex; align-items: center; gap: 5px; }
+.graph-dot { width: 7px; height: 7px; border: 1px solid var(--green); border-radius: 50%; }
 .observed { color: var(--muted); font: 8px "Consolas", monospace; }
 .report { display: flex; align-items: flex-start; gap: 10px; margin: 15px 0; padding: 12px; border: 1px solid color-mix(in srgb, var(--green) 33%, var(--line)); border-radius: 4px; background: color-mix(in srgb, var(--green) 7%, var(--panel)); }
 .check { width: 23px; height: 23px; flex: 0 0 auto; display: grid; place-items: center; color: var(--green); border: 1px solid color-mix(in srgb, var(--green) 55%, var(--line)); border-radius: 50%; }
@@ -135,6 +176,7 @@ footer { display: flex; justify-content: space-between; gap: 12px; margin-top: 2
   .intro { grid-template-columns: minmax(0, 1fr) minmax(145px, .7fr); }
   .intro-copy { grid-column: 1 / -1; }
   .workspace-grid { grid-template-columns: minmax(0, 1fr); }
+  .visual-grid { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 760px) {
   main { display: block; }
@@ -159,6 +201,8 @@ footer { display: flex; justify-content: space-between; gap: 12px; margin-top: 2
   .overview small { font-size: 9px; }
   .workspace-grid article { padding: 12px; }
   .authorization { grid-template-columns: minmax(0, 1fr); }
+  .audit-list > div { grid-template-columns: 22px 1fr auto; }
+  .audit-list small { grid-column: 2 / -1; }
   .auth-explainer { order: 2; }
   footer { align-items: flex-start; flex-direction: column; }
   .sectionhead { align-items: flex-end; }

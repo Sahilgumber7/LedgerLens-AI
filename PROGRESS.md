@@ -36,3 +36,12 @@ No SQLAlchemy persistence/Alembic migrations or cross-process concurrency; no ac
 1. Implement database models, migrations, unique idempotency constraints, and transactional storage; test concurrent duplicate posts and restart replay.
 2. Add typed provider-independent structured tool calling with budgets, prompt-injection-safe tool outputs, and deterministic mock provider tests.
 3. Add multiple scenario families and FinOpsBench split/evaluators, then connect all displayed UI data and recovery history to durable API queries.
+
+### Follow-up: dataset review and dashboard visualization (2026-11-22)
+
+- Added `docs/DATASETS_AND_RELATED_WORK.md` with sourced candidates (MoMTSim, PaySim, BankSim, IBM AMLSim/AML-Data, ULB/Worldline fraud, AIOps Challenge 2020, RCAEval, AIOpsArena), suitability boundaries, license cautions, related project references, and a recommendation to keep FinOpsBench ground truth in the LedgerLens simulator. No external dataset downloaded or result claimed.
+- Added `/api/v1/overview` with live counts from the process-local scenario, event records, journals, and deterministic detector. Verified loss remains explicitly unestablished. Incident detection now treats a compensated journal as inactive; the incident list and overview clear after reversal.
+- Expanded the dashboard with API-backed event-source bars, severity visualization, operating metrics, recovery audit activity, and a keyword field with a visible side explainer. The keyword gate is explicitly identified as a demo sandbox check, not authentication.
+- Refreshes overview, incidents, and audit data after recovery execution. Browser coverage now checks chart presence, keyword display, themes, rupee formatting, mobile table scroll, and no viewport overflow at 320/375/768/1280 pixels.
+- Verification run: `python -m pytest -q` = 7 passed (one upstream Starlette deprecation warning); Ruff passed; dashboard ESLint passed; `npx tsc --noEmit` passed; Playwright = 3 passed. Existing local API and dashboard respond at `127.0.0.1:8000` and `127.0.0.1:3000`.
+- Still unimplemented: durable persistence, real provider-backed agent, multiple simulator failure families, FinOpsBench execution, regulatory rules, and production authentication. Dashboard shows actual current demo state only and is not a complete product console yet.

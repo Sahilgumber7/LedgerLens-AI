@@ -267,11 +267,16 @@ class Incident:
 
 def detect_incidents(s: Scenario, ledger: Ledger) -> list[Incident]:
     out = []
+    reversed_ids = {journal.reverses for journal in ledger.journals if journal.reverses}
     for p in {e.payment_id for e in s.events}:
         cap = sum(e.event_type == "payment.captured" for e in s.events if e.payment_id == p)
-        posted = sum(j.idempotency_key.startswith("capture:" + p) for j in ledger.journals)
+        related = [
+            j
+            for j in ledger.journals
+            if j.idempotency_key.startswith("capture:" + p) and j.id not in reversed_ids
+        ]
+        posted = len(related)
         if posted > cap:
-            related = [j for j in ledger.journals if j.idempotency_key.startswith("capture:" + p)]
             out.append(
                 Incident(
                     "inc_" + p,

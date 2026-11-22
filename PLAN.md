@@ -10,6 +10,8 @@
 - [ ] Durable audit persistence and stronger approval identity beyond the local demo token.
 - [ ] FinOpsBench split/generation/evaluators and measured baselines.
 - [x] API-backed Next.js first-view dashboard with evidence and sandbox recovery flow.
+- [x] API-backed operational overview charts, visible demo keyword explainer, audit activity, and responsive browser checks.
+- [x] Third-party dataset and related-project review with licensing/scope cautions.
 - [ ] Remaining operational pages (payment explorer, full incident workspace, benchmark and audit history).
 - [x] Docker Compose/Dockerfiles and initial project docs (container runtime not verified).
 - [ ] CI and independently reproducible benchmark.

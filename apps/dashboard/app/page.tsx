@@ -22,6 +22,7 @@ type Graph = {
   nodes: { id: string; type: string; event_type?: string; source?: string }[];
   edges: { source: string; target: string; relation: string; inferred: boolean }[];
 };
+type Overview = { data_origin: string; open_incidents: number; affected_payments: number; suspected_exposure_minor: number; verified_loss_minor: number | null; severity_counts: Record<string, number>; event_source_counts: Record<string, number>; event_count: number; journal_count: number; ledger_version: number };
 type IconName = "alert" | "card" | "recovery" | "bench" | "sun" | "moon" | "check" | "key";
 
 const api = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -45,6 +46,8 @@ function Icon({ name, size = 16 }: { name: IconName; size?: number }) {
 export default function Home() {
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [graph, setGraph] = useState<Graph | null>(null);
+  const [overview, setOverview] = useState<Overview | null>(null);
+  const [auditItems, setAuditItems] = useState<{ event: string; recovery_id?: string; journal_id?: string }[]>([]);
   const [diagnosis, setDiagnosis] = useState<Diagnosis | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -64,9 +67,12 @@ export default function Home() {
     }
     async function load() {
       try {
-        const response = await fetch(`${api}/api/v1/incidents`);
+        const [response, overviewResponse, auditResponse] = await Promise.all([fetch(`${api}/api/v1/incidents`), fetch(`${api}/api/v1/overview`), fetch(`${api}/api/v1/audit`)]);
         if (!response.ok) throw new Error("Incident request failed");
+        if (!overviewResponse.ok || !auditResponse.ok) throw new Error("Overview request failed");
         const data = await response.json();
+        setOverview(await overviewResponse.json());
+        setAuditItems((await auditResponse.json()).items);
         setIncidents(data.items);
         const first: Incident | undefined = data.items[0];
         if (!first) return;
@@ -131,6 +137,10 @@ export default function Home() {
       const result = await response.json();
       if (!response.ok) throw new Error(result.detail ?? "Sandbox execution failed.");
       setRecoveryStatus(`Sandbox journal ${result.journal_id} recorded. No payment rail was contacted.`);
+      const [overviewResponse, incidentsResponse, auditResponse] = await Promise.all([fetch(`${api}/api/v1/overview`), fetch(`${api}/api/v1/incidents`), fetch(`${api}/api/v1/audit`)]);
+      if (overviewResponse.ok) setOverview(await overviewResponse.json());
+      if (incidentsResponse.ok) setIncidents((await incidentsResponse.json()).items);
+      if (auditResponse.ok) setAuditItems((await auditResponse.json()).items);
     } catch (cause) {
       setActionError(cause instanceof Error ? cause.message : "Approval failed.");
     }
@@ -145,6 +155,7 @@ export default function Home() {
           <a className="active" href="#incidents"><Icon name="alert"/> <span>Incidents</span><b>{loading ? "..." : incidents.length}</b></a>
           <a href="#payments"><Icon name="card"/> <span>Payments</span></a>
           <a href="#recovery"><Icon name="recovery"/> <span>Recovery studio</span></a>
+          <a href="#audit"><Icon name="check"/> <span>Audit trail</span></a>
           <div className="planned-nav" title="FinOpsBench view is planned"><Icon name="bench"/> <span>FinOpsBench</span><small>SOON</small></div>
         </nav>
         <div className="sidefoot"><span className="live-dot"/> SIMULATION ENVIRONMENT<strong>Local workspace</strong></div>
@@ -163,11 +174,22 @@ export default function Home() {
 
         <section className="intro" aria-label="Operational overview">
           <div className="intro-copy"><span className="eyebrow">FINANCIAL CONTROL PLANE</span><h2>Trace the discrepancy.<br/>Verify the next action.</h2><p>Evidence-backed incident review across payment and ledger systems.</p></div>
-          <div className="overview"><span>OPEN INCIDENTS</span><strong>{loading ? "..." : incidents.length}</strong><small>Live API query</small></div>
-          <div className="overview"><span>SUSPECTED EXPOSURE</span><strong>{selected ? inr.format(selected.exposure_minor / 100) : "?"}</strong><small>Integer minor units ? generated data</small></div>
+          <div className="overview"><span>OPEN INCIDENTS</span><strong>{overview?.open_incidents ?? "..."}</strong><small>Live API query</small></div>
+          <div className="overview"><span>SUSPECTED EXPOSURE</span><strong>{overview ? inr.format(overview.suspected_exposure_minor / 100) : "..."}</strong><small>Integer minor units | generated data</small></div>
         </section>
 
         {error && <div className="error" role="alert">{error}</div>}
+
+        <section className="visual-grid" aria-label="Operational charts">
+          <article className="viz-card"><div className="sectionhead"><div><span className="eyebrow">EVENT INGESTION</span><h2>Evidence by source</h2></div><span className="tag">{overview?.event_count ?? "..."} records</span></div>
+            {overview ? <div className="bar-chart" role="img" aria-label="Event count by source">{Object.entries(overview.event_source_counts).map(([name, count], index, items) => <div className="bar-row" key={name}><span>{name}</span><div className="bar-track"><i style={{ width: `${Math.max(5, (count / Math.max(1, ...items.map(([, value]) => value))) * 100)}%`, animationDelay: `${index * 80}ms` }} /></div><b>{count}</b></div>)}</div> : <p className="caption">Loading metrics...</p>}
+            <p className="viz-note">Event counts are not financial totals.</p>
+          </article>
+          <article className="viz-card"><div className="sectionhead"><div><span className="eyebrow">CURRENT STATE</span><h2>Incident severity</h2></div><span className="tag">live</span></div>
+            {overview && <div className="severity-visual"><div className="donut" style={{ "--severity-share": `${overview.open_incidents ? ((overview.severity_counts.high ?? 0) / overview.open_incidents) * 100 : 0}%` } as React.CSSProperties} role="img" aria-label={`${overview.open_incidents} open incidents`}><span><b>{overview.open_incidents}</b><small>open</small></span></div><div className="legend">{Object.entries(overview.severity_counts).map(([name, count]) => <div key={name}><i className={`legend-dot ${name}`} /><span>{name}</span><b>{count}</b></div>)}{overview.open_incidents === 0 && <p className="caption">No active incidents.</p>}</div></div>}
+            <div className="metric-strip"><span>Affected payments <b>{overview?.affected_payments ?? "..."}</b></span><span>Journals <b>{overview?.journal_count ?? "..."}</b></span><span>Verified loss <b>{overview?.verified_loss_minor === null ? "Not established" : overview ? inr.format(overview.verified_loss_minor / 100) : "..."}</b></span></div>
+          </article>
+        </section>
 
         <section id="incidents" aria-labelledby="incidents-title">
           <div className="sectionhead"><div><span className="eyebrow">DETECTED ANOMALIES</span><h2 id="incidents-title">Open incidents</h2></div><span className="muted">{loading ? "Loading..." : `${incidents.length} result${incidents.length === 1 ? "" : "s"}`}</span></div>
@@ -185,8 +207,9 @@ export default function Home() {
           <article id="payments" aria-labelledby="lineage-title">
             <div className="sectionhead"><div><span className="eyebrow">TEMPORAL EVIDENCE</span><h2 id="lineage-title">Event lineage</h2></div><span className="tag">{graph?.nodes.length ?? "?"} nodes</span></div>
             <p className="caption">Observed records are shown with provenance. Timestamp order does not imply causality.</p>
+            {graph && <EvidenceGraph graph={graph} />}
             <div className="timeline" aria-live="polite">
-              {graph?.nodes.filter(node => node.type === "event").map(node => <div className="event" key={node.id}><span className="event-marker"/><div><b>{node.event_type}</b><small>{node.source}<span aria-hidden="true"> ? </span><code>{node.id}</code></small></div><span className="observed">OBSERVED</span></div>)}
+              {graph?.nodes.filter(node => node.type === "event").map(node => <div className="event" key={node.id}><span className="event-marker"/><div><b>{node.event_type}</b><small>{node.source}<span aria-hidden="true"> | </span><code>{node.id}</code></small></div><span className="observed">OBSERVED</span></div>)}
               {!graph && !error && <p className="caption">Loading evidence...</p>}
             </div>
           </article>
@@ -194,15 +217,16 @@ export default function Home() {
           <article id="recovery" aria-labelledby="recovery-title">
             <div className="sectionhead"><div><span className="eyebrow">CONTROLLED RECOVERY</span><h2 id="recovery-title">Simulation report</h2></div><span className="tag neutral">SANDBOX ONLY</span></div>
             <div className="report"><span className="check"><Icon name="check"/></span><div><b>{diagnosis?.root_cause ?? "Loading deterministic diagnosis"}</b><p>{diagnosis?.summary ?? "Diagnosis is retrieved from the incident investigation API."}</p></div></div>
-            <dl className="facts"><div><dt>Invariant check</dt><dd className="good">Balanced journal</dd></div><div><dt>Evidence references</dt><dd>{diagnosis?.observed_facts[0]?.evidence_ids.length ?? "?"} records</dd></div><div><dt>Uncertainty</dt><dd title={diagnosis?.uncertainty}>{diagnosis ? "Explicit ? review evidence" : "?"}</dd></div></dl>
+            <dl className="facts"><div><dt>Invariant check</dt><dd className="good">Balanced journal</dd></div><div><dt>Evidence references</dt><dd>{diagnosis?.observed_facts[0]?.evidence_ids.length ?? "..."} records</dd></div><div><dt>Uncertainty</dt><dd title={diagnosis?.uncertainty}>{diagnosis ? "Explicitly documented" : "..."}</dd></div></dl>
 
             {!recoveryId && <button className="primary" type="button" onClick={simulateRecovery} disabled={!selected || loading}>Simulate proposed reversal</button>}
-            {recoveryId && <div className="authorization">
+            <div className="authorization">
               <div className="authorization-form">
                 <label htmlFor="approval-keyword">Local demo approval keyword</label>
                 <div className="keyword-input"><Icon name="key"/><input id="approval-keyword" type={keywordVisible ? "text" : "password"} autoComplete="off" value={approvalKeyword} onChange={event => setApprovalKeyword(event.target.value)} aria-describedby="keyword-help"/><button className="reveal" type="button" onClick={() => setKeywordVisible(value => !value)}>{keywordVisible ? "Hide" : "Show"}</button></div>
                 <p id="keyword-help" className="field-help">For this local demo, the keyword is prefilled. It is checked by the API before a sandbox-only correction.</p>
-                <button className="primary" type="button" onClick={authorizeAndExecute} disabled={!approvalKeyword.trim()}>Verify keyword &amp; execute in sandbox</button>
+                <button className="primary" type="button" onClick={authorizeAndExecute} disabled={!recoveryId || !recoveryStatus.startsWith("Simulation verified") || !approvalKeyword.trim()}>Verify keyword &amp; execute in sandbox</button>
+                <p className="field-help">Run the isolated simulation above before the keyword check is enabled.</p>
               </div>
               <aside className="auth-explainer" aria-label="How demo keyword approval works">
                 <span className="eyebrow">WHAT THIS KEY DOES</span>
@@ -213,15 +237,31 @@ export default function Home() {
                 <div className="auth-step"><span>3</span><p><b>Sandbox records</b><small>Only the in-memory ledger changes.</small></p></div>
                 <p className="auth-note">This is a demo approval gate, not account login, identity verification, or production-grade authorization.</p>
               </aside>
-            </div>}
+            </div>
             {recoveryStatus && <p className="action-status" role="status">{recoveryStatus}</p>}
             {actionError && <p className="action-error" role="alert">{actionError}</p>}
-            <p className="footnote">Simulation only ? no payment rails ? local state resets on restart</p>
+            <p className="footnote">Simulation only | no payment rails | local state resets on restart</p>
           </article>
         </div>
 
-        <footer><span>LEDGERLENS AI</span><span>DETERMINISTIC FINANCIAL CORE ? v0.1.0</span></footer>
+        <section id="audit" className="audit-panel" aria-labelledby="audit-title"><div className="sectionhead"><div><span className="eyebrow">APPEND-ONLY ACTIVITY</span><h2 id="audit-title">Recovery audit trail</h2></div><span className="tag">{auditItems.length} events</span></div>{auditItems.length ? <div className="audit-list">{auditItems.slice().reverse().map((item, index) => <div key={`${item.event}-${index}`}><span className="audit-mark"><Icon name="check" size={13}/></span><b>{item.event.replaceAll("_", " ")}</b><code>{item.recovery_id ?? "system"}</code><small>{item.journal_id ?? "Recorded in process-local audit"}</small></div>)}</div> : <p className="caption">No recovery actions recorded in this process yet.</p>}</section>
+
+        <footer><span>LEDGERLENS AI</span><span>DETERMINISTIC FINANCIAL CORE | v0.1.0</span></footer>
       </section>
     </main>
   );
+}
+
+function EvidenceGraph({ graph }: { graph: Graph }) {
+  const nodes = [...graph.nodes.filter(node => node.type === "incident"), ...graph.nodes.filter(node => node.type === "event").slice(0, 5), ...graph.nodes.filter(node => node.type === "ledger_entry").slice(0, 2)];
+  const points = nodes.map((node, index) => ({
+    node,
+    x: node.type === "incident" ? 58 : node.type === "ledger_entry" ? 478 : 255,
+    y: node.type === "incident" ? 94 : node.type === "ledger_entry" ? 70 + nodes.filter((item, i) => i < index && item.type === "ledger_entry").length * 58 : 25 + nodes.filter((item, i) => i < index && item.type === "event").length * 34,
+  }));
+  const pointById = new Map(points.map(point => [point.node.id, point]));
+  return <div className="graph-wrap"><svg viewBox="0 0 540 210" role="img" aria-label="Evidence graph with incident, event, and ledger records">
+    {graph.edges.map((edge, index) => { const from = pointById.get(edge.source); const to = pointById.get(edge.target); return from && to ? <line key={`${edge.source}-${edge.target}-${index}`} x1={from.x} y1={from.y} x2={to.x} y2={to.y} className={edge.inferred ? "graph-edge inferred" : "graph-edge"} /> : null; })}
+    {points.map(({ node, x, y }) => <g key={node.id}><circle cx={x} cy={y} r="7" className={`graph-point ${node.type}`} /><text x={x} y={y + 19} textAnchor="middle">{(node.event_type ?? node.type).replaceAll("_", " ").slice(0, 15)}</text></g>)}
+  </svg><div className="graph-note"><span><i className="graph-dot" /> Observed record</span><span>Solid line: detector reference</span><span>Edges do not establish causality</span></div></div>;
 }
